@@ -11,6 +11,7 @@ shinyServer(function(input, output, session) {
   passwords <- data.frame()
   rv <- reactiveValues();
   
+  
   # Return the UI for a modal dialog with username and password inputs. 
   loginModal <- function(db, failed = FALSE) {
     modalDialog(
@@ -39,6 +40,7 @@ shinyServer(function(input, output, session) {
   })
   
   observeEvent(input$loginOk, {
+    print("observeEvent input$loginOk")
     if (is.null(rv$cmdbuser)) {
       rv$cmdpCon <- tryCatch({
         # open connection to cmdp database
@@ -105,6 +107,7 @@ shinyServer(function(input, output, session) {
         
         update_password(rv$cmdpCon, passwords, rv$cmdbuser, rv$cmdbpsw, rv$db, rv$dbuser, rv$dbpsw)
         
+        removeModal();
         # connection succeeds, password must be correct
         con
       },
@@ -121,6 +124,7 @@ shinyServer(function(input, output, session) {
   })
   
   observeEvent(input$db, {
+    print("observeEvent input$db")
     if (identical(input$db, "")) {
       print("input$db empty")
       return()
@@ -134,7 +138,7 @@ shinyServer(function(input, output, session) {
       print("db change event")
       print(passwords)
       entry <- passwords %>% filter(db == input$db) %>% select(dbuser, dbpassword)
-      print("Entry)")
+      print("Entry")
       print (entry)
       
       # Test for an empty result. This will be returned as character(0)
@@ -171,6 +175,23 @@ shinyServer(function(input, output, session) {
       print(e)
     })
     
+  })
+  
+  observeEvent(rv$dbCon, {
+    print("observeEvent rv$dbCon")
+    rv$data_sysmetric <- dbGetQuery(rv$dbCon, qSysmetrics)
+    colnames(rv$data_sysmetric) <<- tolower(colnames(rv$data_sysmetric))
+    
+  })
+  
+  output$sysmetrics <- renderPlotly({
+    print("Plotting sysmetrics")
+    plot_data <- subset(rv$data_sysmetric, metric_name == 'Average Synchronous Single-Block Read Latency');
+    
+    p <- ggplot(plot_data, aes(x = begin_time, y = value)) + geom_point(color="purple")
+    p <- ggplotly(p)
+    
+    p
   })
   
   update_password <- function(con, passwords, cmdbuser, cmdbpassword, db, dbuser, dbpassword) {
