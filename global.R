@@ -29,6 +29,6 @@ uPassword <- 'update  db_credentials
               and     db = lower(:4)
               and     dbuser = upper(:5)'
 
-qSysmetrics <- 'select  begin_time,end_time,intsize_csec,group_id,metric_id,metric_name,value,metric_unit
-                 from    v$sysmetric_history'
+qSysmetrics <- 'select  inst_id,begin_time,end_time,intsize_csec,group_id,metric_id,metric_name,value,metric_unit
+                 from    gv$sysmetric_history'
 
