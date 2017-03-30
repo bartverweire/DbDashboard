@@ -17,9 +17,6 @@ shinyUI(fluidPage(
     sidebarPanel(
       selectInput("db",
                   "Database",
-                  choices = NULL),
-      selectInput("passwords",
-                  "Password",
                   choices = NULL)
     ),
 

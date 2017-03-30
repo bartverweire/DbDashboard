@@ -10,9 +10,9 @@ library(formattable)
 library(plotly)
 
 drv <- dbDriver("Oracle")
-qDbInfo <- " select   core, env, host_name, host_name_1, host_name_2, rac, db_name, lower(db_name||'.'||domain) db_full_name
-             from     config_global_mv
-             order by core"
+# qDbInfo <- " select   core, env, host_name, host_name_1, host_name_2, rac, db_name, lower(db_name||'.'||domain) db_full_name
+#              from     config_global_mv
+#              order by core"
 
 qPasswords <- ' select  lower(cmdbuser) cmdbuser, db, lower(dbuser) dbuser
                       , DBMS_OBFUSCATION_TOOLKIT.DESDecrypt(input_string => dbpwd, key_string => :2) dbpassword
@@ -29,6 +29,6 @@ uPassword <- 'update  db_credentials
               and     db = lower(:4)
               and     dbuser = upper(:5)'
 
-qSysmetrics <- 'select  begin_time,end_time,intsize_csec,group_id,metric_id,metric_name,value,metric_unit
-                 from    v$sysmetric_history'
+qSysmetrics <- 'select  inst_id,begin_time,end_time,intsize_csec,group_id,metric_id,metric_name,value,metric_unit
+                 from    gv$sysmetric_history'
 
