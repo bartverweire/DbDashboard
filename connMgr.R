@@ -15,6 +15,7 @@ conn_mgr <- function(input, output, session) {
   
   # list containing all databases
   db_list <- c(cmdp = 'db_cmdp.cmc.be')
+  connections <- list()
   
   connect <- function(db_name, username = NULL, password = NULL) {
     print(paste("Calling connect with", db_name, username, password))
@@ -22,6 +23,14 @@ conn_mgr <- function(input, output, session) {
     print(paste("Connecting to ", db_full_name))
     
     connection <- tryCatch({
+      con <- connections[[db_name]]
+      
+      if (!is.null(con) && test_connection(con, username, db_name)) {
+        print(paste("Connection for", db_name, "returned from cache"))
+        
+        return (con);
+      }
+      
       if ((is.null(username) || is.null(password)) && !is.null(pw_mgr)) {
         # Get username and password from the password manager
         entry <- pw_mgr$search(db_name)
@@ -40,6 +49,11 @@ conn_mgr <- function(input, output, session) {
         
         # test the connection
         if (test_connection(con, username, db_name)) {
+          print("connections before")
+          print(connections)
+          connections[[db_name]] <<- con
+          print("connections after")
+          print(connections)
           # if the connection test succeeds, update the password manager
           if (!is.null(pw_mgr)) {
             pw_mgr$update_password(db_name, username, password)
