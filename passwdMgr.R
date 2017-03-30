@@ -29,10 +29,10 @@ passwd_mgr <- function(connection_params) {
   
   # Get the passwords from the database
   passwords <- dbGetQuery(con, query_passwords, data = data.frame(pwdb_password, pwdb_username))
-  cat("passwords loaded")
+  print("passwords loaded")
   
   colnames(passwords) <- tolower(colnames(passwords))
-  cat("colnames")
+  print("colnames")
   
   # Get the current password list
   get_passwords <- function() {
@@ -43,7 +43,7 @@ passwd_mgr <- function(connection_params) {
   search <- function(a_db) {
     result <- passwords %>% 
       filter(db == a_db) %>% 
-      select(dbuser, dbpassword)
+      select(username = dbuser, password = dbpassword)
     
     result
   }
@@ -51,22 +51,22 @@ passwd_mgr <- function(connection_params) {
   # add or update a password in the data frame and in the database
   update_password <- function(db, dbuser, dbpassword) {
     operation <- "none"
-    cat("update_password")
+    print("update_password")
     
     if (is.null(passwords)) {
-      cat("passwords data frame is empty")
+      print("passwords data frame is empty")
       operation <- "insert"
       passwords <<- rbind(passwords, c(tolower(pwdb_username), db, dbuser, dbpassword) )
     } else {
-      cat("passwords data frame not empty")
+      print("passwords data frame not empty")
       
       currpw <- passwords[passwords$dbuser == dbuser & passwords$db == db, ]$dbpassword
       if (is.null(currpw) || identical(currpw, character(0))) {
-        cat("new password, inserting")
+        print("new password, inserting")
         operation <- "insert"
         passwords <<- rbind(passwords, c(tolower(pwdb_username), db, dbuser, dbpassword) )
       } else if (currpw != dbpassword) {
-        cat("existing password, updating")
+        print("existing password, updating")
         operation <- "update"
         passwords[passwords$dbuser == dbuser & passwords$db == db, ]$dbpassword <- dbpassword
       }
@@ -74,28 +74,28 @@ passwd_mgr <- function(connection_params) {
     
     if (operation == "insert") {
       tryCatch({
-        cat("inserting password")
+        print("inserting password")
         rs <- dbSendQuery(con, insert_password, 
                           data = data.frame(pwdb_username, db, dbuser, dbpassword, pwdb_password))
         
         dbCommit(con)
-        cat("password inserted")
+        print("password inserted")
       },
       error = function(e) {
-        cat("error inserting new password")
-        cat(e)
+        print("error inserting new password")
+        print(e)
       })
     } else if (operation == "update"){
-      cat("updating password")
+      print("updating password")
       rs <- dbSendQuery(con, update_password, 
                         data = data.frame(dbpassword, pwdb_password, pwdb_username, db, dbuser))
       # execute(rs)
       # dbClearResult(rs)
       dbCommit(con)
-      cat("password updated")
+      print("password updated")
     }
     
-    cat("passwords after operation")
+    print("passwords after operation")
   }
   
   return(list(update_password = update_password,

@@ -10,9 +10,9 @@ library(formattable)
 library(plotly)
 
 drv <- dbDriver("Oracle")
-qDbInfo <- " select   core, env, host_name, host_name_1, host_name_2, rac, db_name, lower(db_name||'.'||domain) db_full_name
-             from     config_global_mv
-             order by core"
+# qDbInfo <- " select   core, env, host_name, host_name_1, host_name_2, rac, db_name, lower(db_name||'.'||domain) db_full_name
+#              from     config_global_mv
+#              order by core"
 
 qPasswords <- ' select  lower(cmdbuser) cmdbuser, db, lower(dbuser) dbuser
                       , DBMS_OBFUSCATION_TOOLKIT.DESDecrypt(input_string => dbpwd, key_string => :2) dbpassword
