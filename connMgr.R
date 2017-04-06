@@ -97,28 +97,7 @@ conn_mgr <- function(input, output, session) {
   get_db_list <- function() {
     return (sort(names(db_list)))
   }
-  # show_login <- function(db_name, failed = FALSE) {
-  #   # Return the UI for a modal dialog with username and password inputs. 
-  #   showModal(
-  #     modalDialog(
-  #       title=paste("Enter credentials for database",db_name),
-  #       textInput("username", "Username",
-  #                 placeholder = 'sdba'
-  #       ),
-  #       passwordInput("password", "Password"),
-  #       conditionalPanel(condition = "FALSE", 
-  #         textInput("db_name", "Database", value = db_name)
-  #       ),
-  #       if (failed)
-  #         div(tags$b("Invalid username or password", style = "color: red;")),
-  #       
-  #       footer = tagList(
-  #         modalButton("Cancel"),
-  #         actionButton("loginOk", "OK")
-  #       )
-  #     )
-  #   )
-  # }
+  
   
   test_connection <- function(connection, username, db_name) {
     sprintf("testing connection %s@%s", username, db_name)

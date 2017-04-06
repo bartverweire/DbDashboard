@@ -43,10 +43,20 @@ shinyServer(function(input, output, session) {
                 placeholder = 'sdba'
       ),
       passwordInput("password", "Password"),
-      conditionalPanel(condition = "TRUE", 
+      conditionalPanel(condition = "false", 
                        textInput("db_name", "Database", value = db_name)
       ),
-
+      # add some javascript to listen for the Enter
+      tags$script('
+        $(document).on("keydown", function (e) {
+          console.log(e.keyCode)
+          if (e.keyCode == 13) {
+            Shiny.onInputChange("lastkeypresscode", e.keyCode);
+          }
+        });
+        '
+      ),
+      
       if (failed)
        div(tags$b("Invalid username or password", style = "color: red;")),
 
@@ -58,7 +68,10 @@ shinyServer(function(input, output, session) {
   }
   
   # Observe login event
-  observeEvent(input$loginOk, {
+  observeEvent({
+    input$loginOk
+    input$lastkeypresscode
+  }, {
     cat("observeEvent input$loginOk")
     
     username <- input$username

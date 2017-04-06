@@ -21,7 +21,8 @@ dbMetricsUI <- function(id) {
                   multiple = TRUE)
     ),
     mainPanel(
-      plotlyOutput(ns("sysmetrics"))
+      uiOutput(ns("plot.region"))
+      #plotlyOutput(ns("sysmetrics"))
     )
   )
 }
@@ -70,6 +71,15 @@ dbMetrics <- function(input, output, session, db_con) {
     
   })
   
+  output$plot.region <- renderUI({
+    print("MODULE - metrics, define region")
+    ns <- session$ns
+    
+    dyn_height <- 400 * ((length(input$metric_name) + 1) %/% 2)
+    print(sprintf("MODULE - metrics, setting plot height to %d", dyn_height))
+    plotlyOutput(ns("sysmetrics"), height = dyn_height )
+  })
+  
   output$sysmetrics <- renderPlotly(generatePlot())
 
   generatePlot <- reactive({
@@ -83,15 +93,14 @@ dbMetrics <- function(input, output, session, db_con) {
     print("MODULE - metrics - Plotting sysmetrics with real data")
     plot_data <- subset(metric_data(), metric_name %in% input$metric_name);
 
-    p <- ggplot(plot_data, aes(x = begin_time, y = value, color = factor(inst_id))) +
+    p <- ggplot(plot_data, aes(x = begin_time, y = value, color = factor(inst_id)), labels = levels(factor(inst_id))) +
       geom_line() +
       geom_point() +
-      facet_wrap(~metric_name, ncol = 2, scales = "free")
+      facet_wrap(~metric_name, ncol = 2, scales = "free") + 
+      scale_color_discrete("inst_id")
 
     p <- ggplotly(p)
 
     p
   })
-  
-  output$sysmetrics
 }
