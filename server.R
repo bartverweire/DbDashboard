@@ -70,10 +70,6 @@ shinyServer(function(input, output, session) {
     
     if (!is.null(con)) {
       print("Connection succeeded")
-      # if (!is.null(pw_mgr)) {
-      #   print("Saving password")
-      #   pw_mgr$update_password(db_name, username, password)
-      # }
       
       if (db_name == 'cmdp') {
         print("Connected to cmdp")
@@ -134,28 +130,10 @@ shinyServer(function(input, output, session) {
     colnames(rv$data_sysmetric) <<- tolower(colnames(rv$data_sysmetric))
   })
   
-  output$sysmetrics <- renderPlotly(generatePlot())
-
-  generatePlot <- function() {
-    cat("Plotting sysmetrics")
-    if (is.null(rv$data_sysmetric)) {
-      p <- ggplot()
-
-      return (p)
-    }
-
-    plot_data <- subset(rv$data_sysmetric, metric_name == 'Average Synchronous Single-Block Read Latency');
-
-    p <- ggplot(plot_data, aes(x = begin_time, y = value, color = factor(inst_id))) +
-      geom_line() +
-      geom_point() + 
-      facet_wrap(~metric_name)
-    p <- ggplotly(p)
-
-    p
-  }
-  
-  
-  callModule(dbMetrics, "db.metrics", reactive(input$db), conn_mgr)
+  db_con <- reactive({
+    validate(need(rv$db_con, "Connection must be real"))
+    rv$db_con
+  })
+  callModule(dbMetrics, "db.metrics", db_con)
   
 })

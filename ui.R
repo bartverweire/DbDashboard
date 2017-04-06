@@ -7,30 +7,22 @@
 
 library(shiny)
 
-shinyUI(fluidPage(
-
-  # Application title
-  titlePanel("Database Dashboard"),
-
-  # Sidebar with a slider input for number of bins
-  sidebarLayout(
-    sidebarPanel(
-      selectInput("db",
-                  "Database",
-                  choices = NULL)
-    ),
-
-    # Show a plot of the generated distribution
-    mainPanel(
-      tabsetPanel(
-        tabPanel("DB", 
-          tabsetPanel(
-            tabPanel("Metrics", plotlyOutput("sysmetrics"), dbMetricsUI("db.metrics"))
-          )
-        ),
-        tabPanel("Global")
-      )
-      
+shinyUI(
+  fluidPage(
+    # Sidebar with a slider input for number of bins
+    tabsetPanel(
+      tabPanel("DB", 
+               verticalLayout(
+                 selectInput("db",
+                             label = NULL,
+                             choices = NULL,
+                             selectize = TRUE),
+                 tabsetPanel(
+                   tabPanel("Metrics", dbMetricsUI("db.metrics"))
+                 )
+               )
+      ),
+      tabPanel("Global")
     )
   )
-))
+)
