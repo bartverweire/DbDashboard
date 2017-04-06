@@ -50,10 +50,10 @@ conn_mgr <- function(input, output, session) {
         # test the connection
         if (test_connection(con, username, db_name)) {
           print("connections before")
-          print(connections)
+          print(length(connections))
           connections[[db_name]] <<- con
           print("connections after")
-          print(connections)
+          print(length(connections))
           # if the connection test succeeds, update the password manager
           if (!is.null(pw_mgr)) {
             pw_mgr$update_password(db_name, username, password)

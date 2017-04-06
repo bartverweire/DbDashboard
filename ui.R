@@ -22,7 +22,15 @@ shinyUI(fluidPage(
 
     # Show a plot of the generated distribution
     mainPanel(
-      plotlyOutput("sysmetrics")
+      tabsetPanel(
+        tabPanel("DB", 
+          tabsetPanel(
+            tabPanel("Metrics", plotlyOutput("sysmetrics"), dbMetricsUI("db.metrics"))
+          )
+        ),
+        tabPanel("Global")
+      )
+      
     )
   )
 ))
